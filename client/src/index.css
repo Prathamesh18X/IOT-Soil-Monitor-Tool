@@ -1,0 +1,58 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Roboto', sans-serif; /* Use Roboto font for better readability */
+  background-color: #f3f4f6; /* Set background color */
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.logo {
+  width: 10rem;
+  margin-bottom: 2rem;
+}
+
+.card {
+  background-color: #ffffff;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+}
+
+.card-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #4a5568;
+  margin-bottom: 1rem;
+}
+
+.field-title {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #718096;
+}
+
+.field-val {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #2d3748;
+}
+
+.temp-unit,
+.unit {
+  font-size: 1rem;
+  font-weight: 400;
+  color: #4a5568;
+}
+
+.spacer {
+  height: 1rem;
+}
