@@ -38,8 +38,8 @@ const App = () => {
 
   return (
     <div className='container'>
-      <div className=' flex flex-row align-middle text-left text-7xl font-extrabold'>
-      <img width="200" height="200" src="https://img.icons8.com/color/400/hand-planting.png" alt="hand-planting"/>
+      <div className=' flex flex-row align-middle text-left text-4xl font-extrabold sm:text-7xl'>
+      <img className='w-[125px] h-[125px] sm:w-[200px] sm:h-[200px]' width="200" height="200" src="https://img.icons8.com/color/400/hand-planting.png" alt="hand-planting"/>
       <div className="flex flex-col justify-center">
       <div>Soil Monitoring</div>
       <div className='text-2xl mx-2 font-bold'> IOT tool</div>
