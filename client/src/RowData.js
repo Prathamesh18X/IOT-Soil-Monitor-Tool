@@ -38,8 +38,16 @@ function RowData(props) {
             <div className="row basis-1/2">
               <div className="col-12">
                 <h1 className="field-title">Elements</h1>
-                <h1><span className="text-xl font-extrabold">N<sub>2</sub> : </span>{props.nitrogen}</h1>
-                <h1><span className="text-xl font-extrabold">P : </span>{props.phosporus}</h1>
+                <h1>
+                  <span className="text-xl font-extrabold">
+                    N<sub>2</sub> :
+                  </span>
+                  {props.nitrogen}
+                </h1>
+                <h1>
+                  <span className="text-xl font-extrabold">P : </span>
+                  {props.phosporus}
+                </h1>
               </div>
             </div>
           </div>
