@@ -1,51 +1,54 @@
-require("dotenv").config();
-const express = require("express");
-const mqtt = require("mqtt");
-const cors = require("cors");
+import express from "express";
+import mqtt from "mqtt";
+import cors from "cors";
+import { createServer } from "http";
+import { Server } from "socket.io";
+import dotenv from "dotenv";
+import deviceRoutes from "./routes/device.routes.js";
+import connectToMongoDB from "./db/connect.js";
+
+dotenv.config();
 
 const app = express();
-const http = require("http").Server(app);
-const io = require("socket.io")(http, {
+const http = createServer(app);
+const io = new Server(http, {
   cors: {
     origin: "*",
   },
 });
 
-app.use(cors());
 
-var options = {
+app.use(cors());
+app.use(express.json());
+
+const options = {
   keepalive: 0,
   clientId: "mqttjs_" + Math.random().toString(16).substr(2, 8),
   reconnectPeriod: 5000,
   connectTimeout: 20 * 1000,
-  // username: process.env.MQTT_USERNAME,
-  // password: process.env.MQTT_PASSWORD,
   rejectUnauthorized: false,
 };
 
 const connectUrl = process.env.MQTT_SERVER;
-var connectedClients = 0;
-
 var client = mqtt.connect(connectUrl, options);
+
 client.on("error", function (err) {
   console.log(err);
   client.end();
 });
 
 client.on("connect", () => {
-  console.log("Connected");
+  console.log("Connected to MQTT server");
+  client.subscribe("app");
+  client.subscribe("device/status");
 });
 
 io.on("connection", (socket) => {
   socket.on("disconnect", () => {
-    connectedClients--;
-    console.log("Client left: ", connectedClients);
+    // Handle socket disconnection if needed
   });
-  connectedClients++;
-  console.log("New client: ", connectedClients);
 });
 
-client.subscribe("app");
 client.on("message", (topic, message) => {
   const verifyJSON = (json) => {
     let parsed;
@@ -56,11 +59,20 @@ client.on("message", (topic, message) => {
     }
     return parsed;
   };
-  var received = verifyJSON(message);
-  console.log("Topic: " + topic + "\nMessage: ", JSON.stringify(received));
-  io.emit("app", received);
+
+   if (topic === "app") {
+    const received = verifyJSON(message);
+    if (received && received.name) {
+      io.emit("app", received);
+    }
+  }
 });
+
+app.use("/api/devices", deviceRoutes);
 
 http.listen(8080, () => {
   console.log("Listening on port 8080");
+  connectToMongoDB();
 });
+
+export {io}
