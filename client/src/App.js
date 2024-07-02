@@ -1,12 +1,28 @@
 import React, { useState, useEffect } from "react";
-import RowData from "./RowData";
+import RowData from "./components/RowData";
 import io from "socket.io-client";
+import AddDevice from "./components/AddDevice";
 
 const App = () => {
-  const [sensors, setsensors] = useState([]);
+  const [sensors, setSensors] = useState([]);
 
   useEffect(() => {
     const socket = io("http://localhost:8080");
+
+    const fetchData = async () => {
+      try {
+        const response = await fetch("http://localhost:8080/api/devices");
+        const data = await response.json();
+        setSensors(data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+    socket.on("DEVICE_ADDED", (newDevice) => {
+      setSensors((prevSensors) => [...prevSensors, newDevice]);
+    });
     socket.on("app", (received) => {
       updateData(received);
     });
@@ -17,27 +33,22 @@ const App = () => {
   }, []);
 
   const updateData = (received) => {
-    setsensors((prevsensors) => {
-      const sensorList = prevsensors.map((sensor) => sensor.name);
-      if (sensorList.includes(received.name)) {
-        return prevsensors.map((sensor) =>
-          sensor.name !== received.name
-            ? sensor
-            : { ...received, id: sensor.id }
+    setSensors((prevSensors) => {
+      const existingSensor = prevSensors.find((sensor) => sensor.name === received.name);
+
+      if (existingSensor) {
+        const updatedSensors = prevSensors.map((sensor) =>
+          sensor.name === received.name ? { ...sensor, ...received } : sensor
         );
+        return updatedSensors;
       } else {
-        return [...prevsensors, { ...received, id: createId() }];
+        return [...prevSensors, received];
       }
     });
   };
 
-  const createId = () => {
-    createId.uniqueId = createId.uniqueId || 0;
-    return createId.uniqueId++;
-  };
-
   const sensorRows = sensors.map((sensor) => (
-    <RowData key={sensor.id} {...sensor} />
+    <RowData key={sensor._id} {...sensor} />
   ));
 
   return (
@@ -56,6 +67,9 @@ const App = () => {
         </div>
       </div>
       <div className="spacer" />
+      <div className="p-4">
+        <AddDevice />
+      </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {sensorRows}
       </div>
